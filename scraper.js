@@ -15,7 +15,7 @@ async function pageScrap(arr, dep, date) {
   await page.waitForTimeout(2000).then(_ => console.log('Waited.'));
 
   //Grab flight number
-  const e = page.waitForXPath('/html/body/div[2]/div/div/div/div[2]/div[2]/div/div[2]/div/section/div/div[1]/div[2]/section/div[6]/span/span/ul/li[1]/div[1]/div/div/button/span[1]').then(() => console.log(`Found XPATH ${e[0]}`));
+  const e = await page.waitForXPath('/html/body/div[2]/div/div/div/div[2]/div[2]/div/div[2]/div/section/div/div[1]/div[2]/section/div[6]/span/span/ul/li[1]/div[1]/div/div/button/span[1]').then(() => console.log(`Found XPATH ${e[0]}`));
 
   browser.close();
 }
