@@ -3,12 +3,15 @@
 //require library
 const puppeteer = require('puppeteer');
 
+//import processing functions
+const {processFlightNums} = require('./processing');
+
 
 //Create class -- this is the one that gets returned to main.js
 class Allflights {
-  constructor(deptPort, arrPort, flight1, flight2, flight3, flight4, flight5, flight6){
-    this.deptPort = deptPort; //String of departure airport code
-    this.arrPort = arrPort; //String of arrival airport code
+  constructor(departurePort, arrivalPort, flight1, flight2, flight3, flight4, flight5, flight6){
+    this.departurePort = departurePort; //String of departure airport code
+    this.arrivalPort = arrivalPort; //String of arrival airport code
     this.flight1 = flight1; //an object containing the class below
     this.flight2 = flight2;
     this.flight3 = flight3;
@@ -20,7 +23,7 @@ class Allflights {
 
 //Create Metadata class 
 class Flight{
-  constructor(stops, flightNums, deptTime, arrTime, duration, prices, seatsLeft){
+  constructor(stops, planeChange, flightNums, deptTime, arrTime, duration, prices, seatsLeft){
     this.stops = stops; //number of stops or 'Nonstop' string
     this.planeChange = planeChange; // array with either a -1 or a 1 and an airport code. [-1] || [1, 'DAL']
     this.flightNums = flightNums; //array of flight numbers
@@ -32,27 +35,38 @@ class Flight{
   }
 };
 
-async function pageScrape(url) {
-  const browser = await puppeteer.launch({headless: false});
+async function pageScrape(dept, arr, url) {
+  //initilize class variables
+  let departurePort = dept, arrivalPort = arr, stops, planeChange, flightNums, deptTime, arrTime, duration, prices, seatsLife;
+
+  const browser = await puppeteer.launch({headless: false, defaultViewport: {width: 988, height: 977}});
   const page = await browser.newPage();
-  await page.setViewport({width: 1920, height: 977});
   await page.goto(url);
   //Human Bahavior - Timeout for 2 secs
-  await page.waitForTimeout(2000).then(_ => console.log('Waited.'));
+  await page.waitForTimeout(2000);
 
   //Press search button
   const search = await page.waitForXPath('//*[@id="form-mixin--submit-button"]');
   await search.click();
+
   //Human Bahavior - Timeout for 2.5 secs
-  await page.waitForTimeout(2500).then(_ => console.log('Waited.'));
+  await page.waitForTimeout(2500);
 
-  //Scrape data for row
-  await page.waitForXPath('//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[1]/div[1]/div/div/button/span[1]');
-  const flightNumElement = await page.$x('//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[1]/div[1]/div/div/button/span[1]');
-  const flightNum = await page.evaluate(el => el.textContent, flightNumElement[0]);
- 
-console.log(flightNum);
+  console.log(departurePort);
+  console.log(arrivalPort);
 
+  //Scrape Flight data for row
+  for(let i = 1; i <= 6; i++){
+    //Flight Nums
+    await page.waitForXPath(`//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[1]/div/div/button/span[1]`);
+    const flightNumElement = await page.$x(`//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[1]/div/div/button/span[1]`);
+    const flightNumStr = await page.evaluate(el => el.textContent, flightNumElement[0]);
+    //Store final flightNums value
+    flightNums = processFlightNums(flightNumStr);
+
+    //All row values
+    console.log(flightNums);
+  }
 
   //browser.close();
 }

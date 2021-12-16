@@ -4,8 +4,8 @@ const {DateTime} = require('luxon');
 const dateStr = DateTime.now().plus({days : 14}).toISODate();
 
 //import modules
-const {scraper} = require('./scraper');
-const {airCodes} = require('./data');
+const {scraper} = require('./javascript modules/scraper');
+const {airCodes} = require('./javascript modules/data');
 
 
 //Create URL
@@ -14,4 +14,7 @@ const {airCodes} = require('./data');
 //test url
 const testURL = `https://www.southwest.com/air/booking/select.html?adultPassengersCount=1&departureDate=2021-12-16&departureTimeOfDay=ALL_DAY&destinationAirportCode=IAD&fareType=USD&int=HOMEQBOMAIR&originationAirportCode=HOU&passengerType=ADULT&reset=true&returnDate=&returnTimeOfDay=ALL_DAY&tripType=oneway`
 
-scraper(testURL);
+const dept = 'HOU';
+const arr = 'IAD';
+
+scraper(dept, arr, testURL);
