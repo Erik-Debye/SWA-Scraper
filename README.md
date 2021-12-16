@@ -7,7 +7,9 @@ As of now, this is an unfinished project. Scraping capabilities are currently un
 The goal is to scrape the first six rows of future (2 weeks out) flights data between each Southwest Airport (as of Dec. 2021). The data will include the following, formatted like so:
 
 {
+
     departurePort: 'ATL',
+    
     arrivalPort: 'BWI',
 
     flight1: {
