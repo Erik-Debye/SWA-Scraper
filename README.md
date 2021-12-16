@@ -75,15 +75,15 @@ The goal is to scrape the first six rows of future (2 weeks out) flights data be
 
 Notes: 
 
->numStops will consist of either a number (as a String) of stops OR the string 'Nonstop'
+>numStops will consist of either a number (as a String) of stops OR the string 'Nonstop'.
 
->changePlanes will consist of an array with a -1 if there is no plane change OR an array with a 1 and an airport code (i.e. [1, 'DAL'])
+>changePlanes will consist of an array with a -1 if there is no plane change OR an array with a 1 and an airport code i.e. [1, 'DAL'].
 
->flightNums will only consist of Numeric values as SW does not currently use ALpha-Numeric Flight Numbers
+>flightNums will only consist of Numeric values as South West does not currently use ALpha-Numeric Flight Numbers.
 
->The prices array will currently mimic the structure of the webpage, reading left to right. The price catagories are as follows: [Business Select, Anytime, Wanna Get Away]. The string 'Unavailable' will indicate when tickets for that seat were sold out.
+>The prices array will mimic the structure of the webpage, reading left to right. The price catagories are as follows: [Business Select, Anytime, Wanna Get Away]. The string 'Unavailable' will indicate when tickets for that seat were sold out.
 
-> IMPORTANT - seatsLeft will either consist of a positive number which will indicate the number of seats left for that category of ticket or a -1. It is important to understand that -1 does not mean seats are all taken, but rather that there are many seats OR no seats. It's order is the same as the prices array (reading page left to right). Do NOT use seatsLeft to determine if seats exist (use the prices property). 
+>seatsLeft will either consist of a positive number which will indicate the number of seats left for that category of ticket or a -1. It is important to understand that -1 does not mean all seats were taken, but rather that there are many seats OR no seats. It's order is the same as the prices array (reading page left to right). Do NOT use seatsLeft to determine if seats exist (use the prices property). 
 
  
 The goal for this project is to pass all this data into your Supabase database. To do so, you must create an account there and create a table with the specified properties. Then add your anon restful API key into the project and hopefully it should then push data into the database as it creates it. This is still a theoretical feature that hasn't been fully fleshed out. But hey that's the currrent line of thought. 
