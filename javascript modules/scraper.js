@@ -1,14 +1,12 @@
 'use strict';
-
-//require library
 const puppeteer = require('puppeteer');
 
 //import processing functions
 const {processFlightNums} = require('./processing');
 
 
-//Create class -- this is the one that gets returned to main.js
-class Allflights {
+//Create class -- this is the one that will be pushed into supabase as jsonb
+class FlightsObj {
   constructor(departurePort, arrivalPort, flight1, flight2, flight3, flight4, flight5, flight6){
     this.departurePort = departurePort; //String of departure airport code
     this.arrivalPort = arrivalPort; //String of arrival airport code
@@ -35,9 +33,9 @@ class Flight{
   }
 };
 
-async function pageScrape(dept, arr, url) {
+async function pageScrape(dept, arr, dateStr, url) {
   //initilize class variables
-  let departurePort = dept, arrivalPort = arr, stops, planeChange, flightNums, deptTime, arrTime, duration, prices, seatsLife;
+  let departurePort = dept, arrivalPort = arr, date = dateStr, stops, planeChange, flightNums, deptTime, arrTime, duration, prices, seatsLife;
 
   const browser = await puppeteer.launch({headless: false, defaultViewport: {width: 988, height: 977}});
   const page = await browser.newPage();
@@ -54,6 +52,7 @@ async function pageScrape(dept, arr, url) {
 
   console.log(departurePort);
   console.log(arrivalPort);
+  console.log(date);
 
   //Scrape Flight data for row
   for(let i = 1; i <= 6; i++){
@@ -67,8 +66,7 @@ async function pageScrape(dept, arr, url) {
     //All row values
     console.log(flightNums);
   }
-
-  //browser.close();
+  browser.close();
 }
 
 
