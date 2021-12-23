@@ -59,6 +59,8 @@ async function pageScrape(dept, arr, dateStr, url) {
   console.log(arrivalPort);
   console.log(date);
 
+
+  //THE REQUIREMENTS HERE ARE SKIPPING THE FOR LOOP COMPLETELY. NEED TO REASERCH A BETTER SOLUTION
   await page.waitForXPath('//*[@id="air-booking-product-0"]/div[6]/span/span/ul');
   const rows = await page.$x('//*[@id="air-booking-product-0"]/div[6]/span/span/ul');
 
