@@ -1,7 +1,7 @@
 'use strict';
 //import datetime & grab date in yyyy-mm-dd (add one day) -- if you want to customize the date look here for help: https://moment.github.io/luxon/#/tour?id=math
 const { DateTime } = require('luxon');
-const dateStr = DateTime.now().plus({ days: 12 }).toISODate();
+const dateStr = DateTime.now().plus({ days: 9 }).toISODate();
 
 //import modules
 const { scraper } = require('./javascript modules/scraper');
