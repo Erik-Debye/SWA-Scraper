@@ -52,8 +52,11 @@ async function pageScrape(dept, arr, dateStr, url) {
   //Human Bahavior - Timeout for 2 secs
   await page.waitForTimeout(2000);
 
-  //Human Bahavior - Timeout for 2.5 secs
-  await page.waitForTimeout(2500);
+  if (page.url() != url) {
+    //Press search button
+    const search = await page.waitForXPath('//*[@id="form-mixin--submit-button"]');
+    await search.click();
+  }
 
   //Counting # of rows
   const count = await page.$$eval('.air-booking-select-detail', (rows) => rows.length);
