@@ -24,8 +24,15 @@ const processSeatsLeft = (str) => {
   return seats;
 };
 
+const processPlaneChange = (str) => {
+  let planeChangeArr = str.split(' ');
+  let planeChange = planeChangeArr[2];
+  return planeChange;
+};
+
 module.exports = {
   processFlightNums: processFlightNums,
   processNumStops: processNumStops,
   processSeatsLeft: processSeatsLeft,
+  processPlaneChange: processPlaneChange,
 };

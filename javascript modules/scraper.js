@@ -5,7 +5,7 @@ const puppeteerExtra = require('puppeteer-extra');
 const pluginStealth = require('puppeteer-extra-plugin-stealth');
 
 //import processing functions
-const { processFlightNums, processNumStops, processSeatsLeft } = require('./processing');
+const { processFlightNums, processNumStops, processSeatsLeft, processPlaneChange } = require('./processing');
 
 //Create class -- this is the one that will be pushed into supabase as jsonb
 class FlightObj {
@@ -84,17 +84,16 @@ async function pageScrape(dept, arr, dateStr, url) {
         numStops = 'Nonstop';
       }
 
-      /*
       //Change Planes
       const planeChangeElement =
-        (await page.$x(`//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[16]/div[4]/div[2]/text()[2]`)) || null;
+        (await page.$x(`//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[4]/div[2]`)) || null;
       if (planeChangeElement) {
-        planeChange = await page.evaluate((el) => el.textContent, planeChangeElement[0]);
+        const planeChangeStr = await page.evaluate((el) => el.textContent, planeChangeElement[0]);
+        planeChange = processPlaneChange(planeChangeStr);
       } else {
         planeChange = null;
       }
-      console.log(planeChange);
-      */
+
       //depttime
       const deptTimeElement = await page.$x(
         `//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[2]/span/text()`
@@ -122,25 +121,26 @@ async function pageScrape(dept, arr, dateStr, url) {
       duration = await page.evaluate((el) => el.textContent, durationElement[0]);
 
       //prices
-      for (let j = 0; j <= 3; j++) {
-        const priceElement =
-          (await page.$x(`//*[@id="air-booking-fares-0-1"]/div[${j}]/button/span/span/span/span/span[2]/span[2]`)) ||
-          null;
-        if (priceElement) {
-          price = await page.evaluate((el) => el.textContent, priceElement[0]);
+
+      for (let j = 1; j <= 3; j++) {
+        const priceElement = await page.$x(
+          `//*[@id="air-booking-fares-0-${i}"]/div[${j}]/button/span/span/span/span/span[2]/span[2]`
+        );
+        if (priceElement.length > 0) {
+          const price = await page.evaluate((el) => el.textContent, priceElement[0]);
           prices.push(price);
         } else {
           prices.push(null);
         }
       }
-      console.log(prices);
 
       //Seats left
-      for (let j = 0; j <= 3; j++) {
-        const seatsLeftElement =
-          (await page.$x(`//*[@id="air-booking-fares-0-1"]/div[${j}]/button/span/span/span/div/span`)) || null;
-        if (seatsLeftElement) {
-          seatsLeftStr = await page.evaluate((el) => el.textContent, priceElement[0]);
+      for (let j = 1; j <= 3; j++) {
+        const seatsLeftElement = await page.$x(
+          `//*[@id="air-booking-fares-0-${i}"]/div[${j}]/button/span/span/span/div/span`
+        );
+        if (seatsLeftElement.length > 0) {
+          const seatsLeftStr = await page.evaluate((el) => el.textContent, seatsLeftElement[0]);
           seatsLeft.push(processSeatsLeft(seatsLeftStr));
         } else {
           seatsLeft.push(null);
@@ -150,6 +150,10 @@ async function pageScrape(dept, arr, dateStr, url) {
       let metadata = new MetadataObj(flightNums, numStops, planeChange, deptTime, arrTime, duration, prices, seatsLeft);
       let flight = new FlightObj(departurePort, arrivalPort, date, metadata);
       console.log(flight);
+
+      //Reset Arrays
+      prices.length = 0;
+      seatsLeft.length = 0;
     }
   }
   browser.close();
