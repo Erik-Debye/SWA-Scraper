@@ -6,7 +6,7 @@ const { DateTime } = require('luxon');
 //import modules
 const { scraper } = require('./javascript modules/scraper');
 const { airCodes } = require('./javascript modules/data');
-const { months, days } = require('./javascript modules/config2');
+const { months, days } = require('./javascript modules/config');
 
 //Create Date String
 const dateStr = DateTime.now().plus({ months: months }).plus({ days: days }).toISODate();
