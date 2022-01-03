@@ -8,7 +8,7 @@ const pluginStealth = require('puppeteer-extra-plugin-stealth');
 const { processFlightNums, processNumStops, processSeatsLeft, processPlaneChange } = require('./processing');
 
 //import API configuration values
-const { supabaseURL, publicAPIKey } = require('./config1');
+const { supabaseURL, publicAPIKey } = require('./config');
 
 //import supabase and point to table
 const { createClient } = require('@supabase/supabase-js');
@@ -189,7 +189,7 @@ async function pageScrape(dept, arr, dateStr, url) {
   return flight;
 }
 
-//export module source: https://youtu.be/nt9M-rlbWc8
+//export scraper to main.js
 module.exports = {
   scraper: pageScrape,
 };
