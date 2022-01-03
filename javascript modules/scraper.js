@@ -1,11 +1,18 @@
-//Currently need to come up with a good convention for no data values. Either null, or '', or -1. Needs to happen at no flights + no change planes.
-
 'use strict';
+
+//require puppeteer and initialize
 const puppeteerExtra = require('puppeteer-extra');
 const pluginStealth = require('puppeteer-extra-plugin-stealth');
 
 //import processing functions
 const { processFlightNums, processNumStops, processSeatsLeft, processPlaneChange } = require('./processing');
+
+//import API configuration values
+const { supabaseURL, publicAPIKey } = require('./config1');
+
+//import supabase and point to table
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(supabaseURL, publicAPIKey);
 
 //Create class -- this is the one that will be pushed into supabase as jsonb
 class FlightObj {
@@ -31,8 +38,13 @@ class MetadataObj {
   }
 }
 
+//Grabs text from a given element
+const txtGrab = (element) => {
+  page.evaluate((el) => el.textContent, element[0]);
+};
+
 async function pageScrape(dept, arr, dateStr, url) {
-  //initilize class variables
+  //initilize variables
   let departurePort = dept,
     arrivalPort = arr,
     date = dateStr,
@@ -43,28 +55,37 @@ async function pageScrape(dept, arr, dateStr, url) {
     arrTime,
     duration,
     prices = [],
-    seatsLeft = [];
+    seatsLeft = [],
+    metadata,
+    flight;
 
   puppeteerExtra.use(pluginStealth());
-  const browser = await puppeteerExtra.launch({ headless: false, args: ['--start-maximized'] });
+  const browser = await puppeteerExtra.launch({
+    executablepath: 'C:\\Program Files\\Google\\Chrome Dev\\Application\\chrome.exe',
+    userDataDir: 'C:\\Users\\erikd\\AppData\\Local\\Google\\Chrome Dev\\User Data',
+    headless: true,
+    args: ['--start-maximized'],
+  });
   const page = await browser.newPage();
   await page.goto(url, { waitUntil: 'networkidle2' });
-  //Human Bahavior - Timeout for 2 secs
-  await page.waitForTimeout(2000);
 
   if (page.url() != url) {
     //Press search button
     const search = await page.waitForXPath('//*[@id="form-mixin--submit-button"]');
     await search.click();
+    await page.waitForTimeout(8525);
   }
 
+  await page.evaluate((_) => {
+    window.scrollBy(0, 250);
+  });
+
+  await page.waitForTimeout(1245);
   //Counting # of rows
   const count = await page.$$eval('.air-booking-select-detail', (rows) => rows.length);
 
   if (count === 0) {
-    let metadata = new MetadataObj(null, null, null, null, null, null, [null, null, null], [null, null, null]);
-    let flight = new FlightObj(departurePort, arrivalPort, date, metadata);
-    console.log(flight);
+    return false;
   } else {
     //Scrape Flight data for row
     for (let i = 1; i <= count; i++) {
@@ -72,26 +93,26 @@ async function pageScrape(dept, arr, dateStr, url) {
       const flightNumElement = await page.$x(
         `//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[1]/div/div/button/span[1]`
       );
-      const flightNumStr = await page.evaluate((el) => el.textContent, flightNumElement[0]);
+      const flightNumStr = await txtGrab(flightNumElement);
       flightNums = processFlightNums(flightNumStr);
 
       //numstops
-      const numStopsElement =
-        (await page.$x(
-          `//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[4]/div/button/span[1]/div`
-        )) || null;
-      if (numStopsElement) {
-        const numStopsStr = await page.evaluate((el) => el.textContent, numStopsElement[0]);
+      const numStopsElement = await page.$x(
+        `//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[4]/div/button/span[1]/div`
+      );
+      if (numStopsElement.length > 0) {
+        const numStopsStr = await txtGrab(numStopsElement);
         numStops = processNumStops(numStopsStr);
       } else {
         numStops = 'Nonstop';
       }
 
       //Change Planes
-      const planeChangeElement =
-        (await page.$x(`//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[4]/div[2]`)) || null;
-      if (planeChangeElement) {
-        const planeChangeStr = await page.evaluate((el) => el.textContent, planeChangeElement[0]);
+      const planeChangeElement = await page.$x(
+        `//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[4]/div[2]`
+      );
+      if (planeChangeElement.length > 0) {
+        const planeChangeStr = await txtGrab(planeChangeElement);
         planeChange = processPlaneChange(planeChangeStr);
       } else {
         planeChange = null;
@@ -101,36 +122,35 @@ async function pageScrape(dept, arr, dateStr, url) {
       const deptTimeElement = await page.$x(
         `//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[2]/span/text()`
       );
-      const deptTimeStr = await page.evaluate((el) => el.textContent, deptTimeElement[0]);
+      const deptTimeStr = await txtGrab(deptTimeElement);
       const deptTimeAmPm = await page.$x(
         `//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[2]/span/span[2]`
       );
-      const deptTimeAmPmStr = await page.evaluate((el) => el.textContent, deptTimeAmPm[0]);
+      const deptTimeAmPmStr = await txtGrab(deptTimeAmPm);
       deptTime = `${deptTimeStr} ${deptTimeAmPmStr}`;
 
       //arrTime
       const arrTimeElement = await page.$x(
         `//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[3]/span/text()`
       );
-      const arrTimeStr = await page.evaluate((el) => el.textContent, arrTimeElement[0]);
+      const arrTimeStr = await txtGrab(arrTimeElement);
       const arrTimeAmPm = await page.$x(
         `//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[3]/span/span[2]`
       );
-      const arrTimeAmPmStr = await page.evaluate((el) => el.textContent, arrTimeAmPm[0]);
+      const arrTimeAmPmStr = await txtGrab(arrTimeAmPm);
       arrTime = `${arrTimeStr} ${arrTimeAmPmStr}`;
 
       //duration
       const durationElement = await page.$x(`//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[5]`);
-      duration = await page.evaluate((el) => el.textContent, durationElement[0]);
+      duration = await txtGrab(durationElement);
 
       //prices
-
       for (let j = 1; j <= 3; j++) {
         const priceElement = await page.$x(
           `//*[@id="air-booking-fares-0-${i}"]/div[${j}]/button/span/span/span/span/span[2]/span[2]`
         );
         if (priceElement.length > 0) {
-          const price = await page.evaluate((el) => el.textContent, priceElement[0]);
+          const price = await txtGrab(priceElement);
           prices.push(price);
         } else {
           prices.push(null);
@@ -143,23 +163,30 @@ async function pageScrape(dept, arr, dateStr, url) {
           `//*[@id="air-booking-fares-0-${i}"]/div[${j}]/button/span/span/span/div/span`
         );
         if (seatsLeftElement.length > 0) {
-          const seatsLeftStr = await page.evaluate((el) => el.textContent, seatsLeftElement[0]);
+          const seatsLeftStr = await txtGrab(seatsLeftElement);
           seatsLeft.push(processSeatsLeft(seatsLeftStr));
         } else {
           seatsLeft.push(null);
         }
       }
 
-      let metadata = new MetadataObj(flightNums, numStops, planeChange, deptTime, arrTime, duration, prices, seatsLeft);
-      let flight = new FlightObj(departurePort, arrivalPort, date, metadata);
-      console.log(flight);
+      //Create objects
+      metadata = new MetadataObj(flightNums, numStops, planeChange, deptTime, arrTime, duration, prices, seatsLeft);
+      flight = new FlightObj(departurePort, arrivalPort, date, metadata);
+
+      //upload to supabase, print error if it breaks
+      const { error } = await supabase.from('Flights').insert([flight]);
+      if (error) console.log(error);
 
       //Reset Arrays
       prices.length = 0;
       seatsLeft.length = 0;
     }
+
+    await page.waitForTimeout(31542);
   }
   browser.close();
+  return flight;
 }
 
 //export module source: https://youtu.be/nt9M-rlbWc8
