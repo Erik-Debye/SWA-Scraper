@@ -24,6 +24,7 @@ const processSeatsLeft = (str) => {
   return seats;
 };
 
+//example input = 'Change Planes BWI'
 const processPlaneChange = (str) => {
   let planeChangeArr = str.split(' ');
   let planeChange = planeChangeArr[2];

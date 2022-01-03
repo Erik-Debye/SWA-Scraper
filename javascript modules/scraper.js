@@ -14,7 +14,7 @@ const { supabaseURL, publicAPIKey } = require('./config');
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(supabaseURL, publicAPIKey);
 
-//Create class -- this is the one that will be pushed into supabase as jsonb
+//Create class -- this is the one that will be pushed into supabase
 class FlightObj {
   constructor(departurePort, arrivalPort, date, metadata) {
     this.departurePort = departurePort; //String of departure airport code
@@ -37,11 +37,6 @@ class MetadataObj {
     this.seatsLeft = seatsLeft; //number of seats left or -1
   }
 }
-
-//Grabs text from a given element
-const txtGrab = (element) => {
-  page.evaluate((el) => el.textContent, element[0]);
-};
 
 async function pageScrape(dept, arr, dateStr, url) {
   //initilize variables
@@ -93,7 +88,7 @@ async function pageScrape(dept, arr, dateStr, url) {
       const flightNumElement = await page.$x(
         `//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[1]/div/div/button/span[1]`
       );
-      const flightNumStr = await txtGrab(flightNumElement);
+      const flightNumStr = await page.evaluate((el) => el.textContent, flightNumElement[0]);
       flightNums = processFlightNums(flightNumStr);
 
       //numstops
@@ -101,7 +96,7 @@ async function pageScrape(dept, arr, dateStr, url) {
         `//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[4]/div/button/span[1]/div`
       );
       if (numStopsElement.length > 0) {
-        const numStopsStr = await txtGrab(numStopsElement);
+        const numStopsStr = await page.evaluate((el) => el.textContent, numStopsElement[0]);
         numStops = processNumStops(numStopsStr);
       } else {
         numStops = 'Nonstop';
@@ -112,7 +107,7 @@ async function pageScrape(dept, arr, dateStr, url) {
         `//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[4]/div[2]`
       );
       if (planeChangeElement.length > 0) {
-        const planeChangeStr = await txtGrab(planeChangeElement);
+        const planeChangeStr = await page.evaluate((el) => el.textContent, planeChangeElement[0]);
         planeChange = processPlaneChange(planeChangeStr);
       } else {
         planeChange = null;
@@ -122,27 +117,27 @@ async function pageScrape(dept, arr, dateStr, url) {
       const deptTimeElement = await page.$x(
         `//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[2]/span/text()`
       );
-      const deptTimeStr = await txtGrab(deptTimeElement);
+      const deptTimeStr = await page.evaluate((el) => el.textContent, deptTimeElement[0]);
       const deptTimeAmPm = await page.$x(
         `//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[2]/span/span[2]`
       );
-      const deptTimeAmPmStr = await txtGrab(deptTimeAmPm);
+      const deptTimeAmPmStr = await page.evaluate((el) => el.textContent, deptTimeAmPm[0]);
       deptTime = `${deptTimeStr} ${deptTimeAmPmStr}`;
 
       //arrTime
       const arrTimeElement = await page.$x(
         `//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[3]/span/text()`
       );
-      const arrTimeStr = await txtGrab(arrTimeElement);
+      const arrTimeStr = await page.evaluate((el) => el.textContent, arrTimeElement[0]);
       const arrTimeAmPm = await page.$x(
         `//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[3]/span/span[2]`
       );
-      const arrTimeAmPmStr = await txtGrab(arrTimeAmPm);
+      const arrTimeAmPmStr = await page.evaluate((el) => el.textContent, arrTimeAmPm[0]);
       arrTime = `${arrTimeStr} ${arrTimeAmPmStr}`;
 
       //duration
       const durationElement = await page.$x(`//*[@id="air-booking-product-0"]/div[6]/span/span/ul/li[${i}]/div[5]`);
-      duration = await txtGrab(durationElement);
+      duration = await page.evaluate((el) => el.textContent, durationElement[0]);
 
       //prices
       for (let j = 1; j <= 3; j++) {
@@ -150,7 +145,7 @@ async function pageScrape(dept, arr, dateStr, url) {
           `//*[@id="air-booking-fares-0-${i}"]/div[${j}]/button/span/span/span/span/span[2]/span[2]`
         );
         if (priceElement.length > 0) {
-          const price = await txtGrab(priceElement);
+          const price = await page.evaluate((el) => el.textContent, priceElement[0]);
           prices.push(price);
         } else {
           prices.push(null);
@@ -163,7 +158,7 @@ async function pageScrape(dept, arr, dateStr, url) {
           `//*[@id="air-booking-fares-0-${i}"]/div[${j}]/button/span/span/span/div/span`
         );
         if (seatsLeftElement.length > 0) {
-          const seatsLeftStr = await txtGrab(seatsLeftElement);
+          const seatsLeftStr = await page.evaluate((el) => el.textContent, seatsLeftElement[0]);
           seatsLeft.push(processSeatsLeft(seatsLeftStr));
         } else {
           seatsLeft.push(null);
