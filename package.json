@@ -11,8 +11,10 @@
   "license": "ISC",
   "dependencies": {
     "@supabase/supabase-js": "^1.29.1",
+    "ghost-cursor": "^1.1.8",
     "luxon": "^2.2.0",
     "puppeteer-extra": "^3.2.3",
-    "puppeteer-extra-plugin-stealth": "^2.9.0"
+    "puppeteer-extra-plugin-stealth": "^2.9.0",
+    "random-useragent": "^0.5.0"
   }
 }

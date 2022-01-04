@@ -1,8 +1,13 @@
 'use strict';
 
-//require puppeteer and initialize
+//require puppeteer
 const puppeteerExtra = require('puppeteer-extra');
+
+//require humanizers
 const pluginStealth = require('puppeteer-extra-plugin-stealth');
+const { createCursor, getRandomPagePoint, installMouseHelper } = require('ghost-cursor');
+//Needs to be replaced or someone needs to update source of User agents on the package
+const randomUseragent = require('random-useragent');
 
 //import processing functions
 const { processFlightNums, processNumStops, processSeatsLeft, processPlaneChange } = require('./processing');
@@ -55,31 +60,34 @@ async function pageScrape(dept, arr, dateStr, url) {
     flight;
 
   puppeteerExtra.use(pluginStealth());
+
   const browser = await puppeteerExtra.launch({
-    executablepath: 'C:\\Program Files\\Google\\Chrome Dev\\Application\\chrome.exe',
-    userDataDir: 'C:\\Users\\erikd\\AppData\\Local\\Google\\Chrome Dev\\User Data',
-    headless: true,
-    args: ['--start-maximized'],
+    headless: false,
+    args: ['--start-maximized', `--user-agent=${randomUseragent.getRandom()}`, '--disable-extensions'],
   });
   const page = await browser.newPage();
+  const cursor = createCursor(page, await getRandomPagePoint(page), true);
+  await installMouseHelper(page);
   await page.goto(url, { waitUntil: 'networkidle2' });
 
+  //sometimes SW redirectsto the start pageof their booking service
   if (page.url() != url) {
     //Press search button
     const search = await page.waitForXPath('//*[@id="form-mixin--submit-button"]');
-    await search.click();
-    await page.waitForTimeout(8525);
+    await cursor.click(search, { waitForClick: 2577, paddingPercentage: 25 });
+    await page.waitForTimeout(5852);
   }
 
   await page.evaluate((_) => {
-    window.scrollBy(0, 250);
+    window.scrollBy(0, 450);
   });
 
-  await page.waitForTimeout(1245);
+  await page.waitForTimeout(3522);
   //Counting # of rows
   const count = await page.$$eval('.air-booking-select-detail', (rows) => rows.length);
 
   if (count === 0) {
+    browser.close();
     return false;
   } else {
     //Scrape Flight data for row

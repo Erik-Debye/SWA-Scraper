@@ -5,7 +5,7 @@
 const supabaseURL = `YOUR CONFIGURATION URL`;
 const publicAPIKey = `YOUR API KEY`;
 
-//This is where you set when you want to scrap the data from. By default it scraps from the current day, but increasing the months value will traverse that many months forward and similar for the days value. For example, if today was 01/05/22 to get prices from 05/16/2022 you would change the 'months' value to 4 and the 'days' value to 11.
+//This is where you set when you want to scrap the data from. By default it scraps from the current day, but increasing the months value will traverse that many months forward and similar for the days value. For example, if today was 01/05/22 to get prices from 05/16/2022 you would change the 'months' value to 4 and the 'days' value to 11. It will also support negative values.
 
 const months = 0;
 const days = 0;
