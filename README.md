@@ -1,6 +1,12 @@
 # Southwest-Scraper
 
-This is a scraper for Southwest Airlines Flight Information. It saves the scraped data into your private Supabase database (https://supabase.com/) for storage and use. It requires 6 dependancies - puppeteer-extra (to scrape the webpage), puppeteer-extra-plugin-stealth (additional stealth plugin to puppeteer-extra), ghost-cursor (to trick SW's bot checkers), random-useragent (same as ghost-cursor), Luxon (small date package), and supabase-JS (to load data into your database).
+This is a scraper for Southwest Airlines Flight Information. It saves the scraped data into your private Supabase database (https://supabase.com/) for storage and use. It requires 6 dependancies - 
+* puppeteer-extra (to scrape the webpage)
+* puppeteer-extra-plugin-stealth (additional stealth plugin to puppeteer-extra)
+* ghost-cursor (to trick SW's bot checkers)
+* random-useragent (same as ghost-cursor)
+* Luxon (small date package)
+* supabase-JS (to load data into your database)
 
 As of now, this is a 85% finished project. It still needs much refinement as SW still will detect the bot on occassion. There are a few things off the bat that would make this even better:
 
@@ -12,7 +18,7 @@ As of now, this is a 85% finished project. It still needs much refinement as SW 
 
 The tool will scrape up to the first 10 flights between one airport to another on any particular day. The data is organized like this: 
 
-{
+    {
     departurePort: 'ATL',
 
     arrivalPort: 'BWI',
@@ -29,7 +35,7 @@ The tool will scrape up to the first 10 flights between one airport to another o
           flightNums: ["100","1185"],
           planeChange: "DAL"
     }
- }
+    }
 
 Notes: 
 * numStops will consist of either a number (as a String) of stops OR the string 'Nonstop'.
@@ -51,4 +57,4 @@ Finally, access your supabase API credentials in the settings of the project. Co
 
 You can also change the date for which you want to scrape flight data from by adding months/days to the current date following the instructions in the config.js file.
 
-# *WARNING & DISCLAIMER: DO NOT USE THE DATA YOUR SCRAPE FOR COMMERCIAL PURPOSES OR TO MAKE MONEY IN ANY WAY. THE DEVELOPER DOES NOT ATTAIN ANY RESPONSIBILTY FOR YOUR USE OF THE PROGRAM.
+*WARNING & DISCLAIMER: DO NOT USE THE DATA YOUR SCRAPE FOR COMMERCIAL PURPOSES OR TO MAKE MONEY IN ANY WAY. THE DEVELOPER DOES NOT ATTAIN ANY RESPONSIBILTY FOR YOUR USE OF THE PROGRAM.*
