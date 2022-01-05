@@ -1,6 +1,7 @@
 # Southwest-Scraper
 
-This is a scraper for Southwest Airlines Flight Information. It saves the scraped data into your private Supabase database (https://supabase.com/) for storage and use. It requires 6 dependancies - 
+This is a scraper for Southwest Airlines Flight Information. It saves the scraped data into your private Supabase database (https://supabase.com/) for storage and use. To use, you must have Node installed, preferably the latest version (17.0.0+), and the program requires 6 dependancies -> 
+
 * puppeteer-extra (to scrape the webpage)
 * puppeteer-extra-plugin-stealth (additional stealth plugin to puppeteer-extra)
 * ghost-cursor (to trick SW's bot checkers)
@@ -56,5 +57,8 @@ Next, go to supabase.com, create an account, and create a project. Create a new 
 Finally, access your supabase API credentials in the settings of the project. Copy/Paste the URL and the API key to the config.js file using a text editor. 
 
 You can also change the date for which you want to scrape flight data from by adding months/days to the current date following the instructions in the config.js file.
+
+Once you have the configuration file set up, feel free to open up your CMD or Terminal window and start the program using the command #node main.js#
+Each search will open a chromium brower window, and then attempt to scrape the page. When completed, the outcome of the scrape (and the details of the scrape) will print in your CMD/Terminal Window.
 
 *WARNING & DISCLAIMER: DO NOT USE THE DATA YOUR SCRAPE FOR COMMERCIAL PURPOSES OR TO MAKE MONEY IN ANY WAY. THE DEVELOPER DOES NOT ATTAIN ANY RESPONSIBILTY FOR YOUR USE OF THE PROGRAM.*
