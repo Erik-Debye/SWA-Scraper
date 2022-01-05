@@ -1,89 +1,54 @@
 # Southwest-Scraper
 
-This is a scraper for Southwest Airlines Ticket Prices. It saves the scraped data into your private Supabase database (https://supabase.com/) for storage and use. It requires 3 dependancies - Puppeteer (to scrape the webpage), Luxon (small date package), and Supabase-JS (to load data into your database).
+This is a scraper for Southwest Airlines Flight Information. It saves the scraped data into your private Supabase database (https://supabase.com/) for storage and use. It requires 6 dependancies - puppeteer-extra (to scrape the webpage), puppeteer-extra-plugin-stealth (additional stealth plugin to puppeteer-extra), ghost-cursor (to trick SW's bot checkers), random-useragent (same as ghost-cursor), Luxon (small date package), and supabase-JS (to load data into your database).
 
-As of now, this is an unfinished project. Scraping capabilities are currently under development (but going well).
+As of now, this is a 85% finished project. It still needs much refinement as SW still will detect the bot on occassion. There are a few things off the bat that would make this even better:
 
-The goal is to scrape the first six rows of future (2 weeks out) flights data between each Southwest Airport (as of Dec. 2021). The data will include the following, formatted like so:
+* Finding an alternative package to 'random-useragent' or updating the package (located here: https://github.com/skratchdot/random-useragent) from its source. Issue #12 on the package page goes into more details. 
+* Fixing the random mouse movement warnings. Using ghost-cursor clashes with puppeteer-extra, but ghost-cursor has definetely helped with bot detection. Not sure how to fix currently
+* Finding better solutions to SW bot detection methods. In particular, I have seen that restarting the tool at the point of failure will usually work. I suspect this has to do with the chrome profile information (currently puppetteer will create a new one with each program run) but I am not certain - particularly because each scrape opens a new browser after closing the previous one. 
 
+# How it works
 
+The tool will scrape up to the first 10 flights between one airport to another on any particular day. The data is organized like this: 
+
+{
     departurePort: 'ATL',
 
     arrivalPort: 'BWI',
+    
+    date: 2022-04-01T00:00:00.000Z
 
-    flight1: {
-        numStops: '1',
-        changePlanes: [-1],
-        flightNums: ['5263', '4519'],
-        deptTime: '4:30am',
-        arrTime: '7:05am',
-        duration: '2h 35m',
-        prices: ['364', 'Unavailable', '340'],
-        seatsleft: [-1, -1, -1],
-    },
-    flight2: {
-        numStops: '2',
-        changePlanes: [1, 'IAD'],
-        flightNums: ['6778', '4543'],
-        deptTime: '3:30am',
-        arrTime: '7:05am',
-        duration: '3h 35m',
-        prices: ['322', '304', '297'],
-        seatsleft: [-1, 4, 4],
-    },
-    flight3: {
-        numStops: 'Nonstop',
-        changePlanes: [-1],
-        flightNums: ['7423'],
-        deptTime: '6:25am',
-        arrTime: '7:45am',
-        duration: '1h 20m',
-        prices: ['398', '388', 'Unavailable'],
-        seatsleft: [-1, -1, -1],
-    },
-    flight4: {
-        numStops: '1',
-        changePlanes: [-1],
-        flightNums: ['8894', '2564'],
-        deptTime: '11:35am',
-        arrTime: '2:25pm',
-        duration: '2h 50m',
-        prices: ['448', '350', '246'],
-        seatsleft: [-1, 3, 2],
-    },
-    flight5: {
-        numStops: 'Nonstop',
-        changePlanes: [-1],
-        flightNums: ['1184'],
-        deptTime: '3:45pm',
-        arrTime: '6:05pm',
-        duration: '2h 20m',
-        prices: ['Unavailable', 'Unavailable', 'Unavailable'],
-        seatsleft: [-1, -1, -1],
-    },
-    flight6: {
-        numStops: '2',
-        changePlanes: [1, 'IAD'],
-        flightNums: ['5589', '3387'],
-        deptTime: '9:05pm',
-        arrTime: '11:05pm',
-        duration: '2h 0m',
-        prices: ['301', '223', '174'],
-        seatsleft: [2 , -1, 4],
-    },
-
+    metadata: {
+          prices: ["299","259","209"],
+          arrTime: "3:45 PM",
+          deptTime: "6:45 AM",
+          duration: "7h 0m",
+          numStops: "1",
+          seatsLeft: [null,"4","4"],
+          flightNums: ["100","1185"],
+          planeChange: "DAL"
+    }
+ }
 
 Notes: 
+* numStops will consist of either a number (as a String) of stops OR the string 'Nonstop'.
+* planeChange will consist of 'null' if there is no plane change OR an airport code like 'DAL'.
+* The prices array will mimic the structure of the webpage, reading left to right. The price catagories are as follows: [Business Select, Anytime, Wanna Get Away]. The string 'Unavailable' will indicate when tickets for that seat were sold out.
+* seatsLeft will either consist of a positive number which will indicate the number of seats left for that category of ticket or a -1. It is important to understand that -1 does not mean all seats were taken, but rather that there are many seats OR no seats. It's order is the same as the prices array (reading page left to right). Do NOT use seatsLeft to determine if seats exist (use the prices property). 
 
->numStops will consist of either a number (as a String) of stops OR the string 'Nonstop'.
+# How to use
 
->changePlanes will consist of an array with a -1 if there is no plane change OR an array with a 1 and an airport code i.e. [1, 'DAL'].
+To start, download the project and extract its contents. Open in your CMD or Terminal window and navigate to the project. Then install the dependencies using *npm install*.
 
->flightNums will only consist of Numeric values as South West does not currently use ALpha-Numeric Flight Numbers.
+Next, go to supabase.com, create an account, and create a project. Create a new table called 'Flights' with columns named like so -> 
+* departurePort -> set to text
+* arrivalPort -> set to text
+* date -> set to date
+* metadata -> set to jsonb
 
->The prices array will mimic the structure of the webpage, reading left to right. The price catagories are as follows: [Business Select, Anytime, Wanna Get Away]. The string 'Unavailable' will indicate when tickets for that seat were sold out.
+Finally, access your supabase API credentials in the settings of the project. Copy/Paste the URL and the API key to the config.js file using a text editor. 
 
->seatsLeft will either consist of a positive number which will indicate the number of seats left for that category of ticket or a -1. It is important to understand that -1 does not mean all seats were taken, but rather that there are many seats OR no seats. It's order is the same as the prices array (reading page left to right). Do NOT use seatsLeft to determine if seats exist (use the prices property). 
+You can also change the date for which you want to scrape flight data from by adding months/days to the current date following the instructions in the config.js file.
 
- 
-The goal for this project is to pass all this data into your Supabase database. To do so, you must create an account there and create a table with the specified properties. Then add your anon restful API key into the project and hopefully it should then push data into the database as it creates it. This is still a theoretical feature that hasn't been fully fleshed out. But hey that's the currrent line of thought. 
+# *WARNING & DISCLAIMER: DO NOT USE THE DATA YOUR SCRAPE FOR COMMERCIAL PURPOSES OR TO MAKE MONEY IN ANY WAY. THE DEVELOPER DOES NOT ATTAIN ANY RESPONSIBILTY FOR YOUR USE OF THE PROGRAM.
