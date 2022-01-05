@@ -156,7 +156,7 @@ async function pageScrape(dept, arr, dateStr, url) {
           const price = await page.evaluate((el) => el.textContent, priceElement[0]);
           prices.push(price);
         } else {
-          prices.push(null);
+          prices.push('Unavailable');
         }
       }
 
