@@ -9,11 +9,7 @@ This is a scraper for Southwest Airlines Flight Information. It saves the scrape
 * Luxon (small date package)
 * supabase-JS (to load data into your database)
 
-As of now, this is a 85% finished project. It still needs much refinement as SW still will detect the bot on occassion. There are a few things off the bat that would make this even better:
-
-* Finding an alternative package to 'random-useragent' or updating the package (located here: https://github.com/skratchdot/random-useragent) from its source. Issue #12 on the package page goes into more details. 
-* Fixing the random mouse movement warnings. Using ghost-cursor clashes with puppeteer-extra, but ghost-cursor has definetely helped with bot detection. Not sure how to fix currently
-* Finding better solutions to SW bot detection methods. In particular, I have seen that restarting the tool at the point of failure will usually work. I suspect this has to do with the chrome profile information (currently puppetteer will create a new one with each program run) but I am not certain - particularly because each scrape opens a new browser after closing the previous one. 
+As of now, this is a 85% finished project. It still needs much refinement as SW still will detect the bot on occassion. There are a few things off the bat that would make this even better, and if you want to help me find those solutions please look at the issues page. If you find a bug or other problem (or have a request) please open an issue for it!
 
 # How it works
 
@@ -46,7 +42,7 @@ Notes:
 
 # How to use
 
-To start, download the project and extract its contents. Open in your CMD or Terminal window and navigate to the project. Then install the dependencies using *npm install*.
+To start, ensure you have NodeJS installed. Then download the project and extract its contents. Open in your CMD or Terminal window and navigate to the project. Then install the dependencies using *npm install*.
 
 Next, go to supabase.com, create an account, and create a project. Create a new table called 'Flights' with columns named like so -> 
 * departurePort -> set to text
@@ -58,7 +54,8 @@ Finally, access your supabase API credentials in the settings of the project. Co
 
 You can also change the date for which you want to scrape flight data from by adding months/days to the current date following the instructions in the config.js file.
 
-Once you have the configuration file set up, feel free to open up your CMD or Terminal window and start the program using the command #node main.js#
+Once you have the configuration file set up, feel free to open up your CMD or Terminal window and start the program using the command *node main.js*
+
 Each search will open a chromium brower window, and then attempt to scrape the page. When completed, the outcome of the scrape (and the details of the scrape) will print in your CMD/Terminal Window.
 
 *WARNING & DISCLAIMER: DO NOT USE THE DATA YOUR SCRAPE FOR COMMERCIAL PURPOSES OR TO MAKE MONEY IN ANY WAY. THE DEVELOPER DOES NOT ATTAIN ANY RESPONSIBILTY FOR YOUR USE OF THE PROGRAM.*
