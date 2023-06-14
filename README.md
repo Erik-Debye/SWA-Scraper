@@ -42,7 +42,7 @@ Notes:
 
 # How to use
 
-To start, ensure you have NodeJS installed. Then download the project and extract its contents. Open in your CMD or Terminal window and navigate to the project. Then install the dependencies using *npm install*.
+To start, ensure you have NodeJS installed. Then download the project and extract its contents. Open in your CMD or Terminal window and navigate to the project. Then install the dependencies using `npm install`.
 
 Next, go to supabase.com, create an account, and create a project. Create a new table called 'Flights' with columns named like so -> 
 * departurePort -> set to text
@@ -54,7 +54,7 @@ Finally, access your supabase API credentials in the settings of the project. Co
 
 You can also change the date for which you want to scrape flight data from by adding months/days to the current date following the instructions in the config.js file.
 
-Once you have the configuration file set up, feel free to open up your CMD or Terminal window and start the program using the command *node main.js*
+Once you have the configuration file set up, feel free to open up your CMD or Terminal window and start the program using the command `node main.js`
 
 Each search will open a chromium brower window, and then attempt to scrape the page. When completed, the outcome of the scrape (and the details of the scrape) will print in your CMD/Terminal Window.
 
