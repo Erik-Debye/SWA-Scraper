@@ -1,15 +1,18 @@
-'use strict';
+"use strict";
 
 //import datetime & grab date in yyyy-mm-dd (add one month + one day) -- if you want to customize the date look here for help: https://moment.github.io/luxon/#/tour?id=math
-const { DateTime } = require('luxon');
+const { DateTime } = require("luxon");
 
 //import modules
-const { scraper } = require('./javascript modules/scraper');
-const { airCodes } = require('./javascript modules/data');
-const { months, days } = require('./javascript modules/config');
+const { scraper } = require("./javascript modules/scraper");
+const { airCodes } = require("./javascript modules/data");
+const { months, days } = require("./javascript modules/config");
 
-//Create Date String
-const dateStr = DateTime.now().plus({ months: months }).plus({ days: days }).toISODate();
+//Create Date String using ISO Format
+const dateStr = DateTime.now()
+  .plus({ months: months })
+  .plus({ days: days })
+  .toISODate();
 
 //Create URLs
 (async function () {
@@ -29,4 +32,3 @@ const dateStr = DateTime.now().plus({ months: months }).plus({ days: days }).toI
     }
   }
 })();
-
